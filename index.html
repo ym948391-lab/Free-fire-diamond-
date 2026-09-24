@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
-  <!-- Monetag Rewarded Interstitial Script -->
+  <!-- Monetag Rewarded Interstitial SDK -->
   <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160" async></script>
 
   <style>
@@ -51,11 +51,11 @@
     .nav button { padding: 8px 16px; color: #64748b; background: transparent; font-size: 14px; }
     .nav button.active { color: var(--accent); font-weight: bold; }
     
-    .modal { display: none; position: fixed; inset: 0; z-index: 20; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); }
+    .modal { display: none; position: fixed; inset: 0; z-index: 20; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); }
     .modal.open { display: flex; }
-    .modal-content { width: 90%; max-width: 400px; padding: 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); }
+    .modal-content { width: 90%; max-width: 400px; padding: 25px 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); text-align: center; }
     
-    label { display: block; margin: 12px 0 5px; color: var(--muted); font-size: 13px; }
+    label { display: block; margin: 12px 0 5px; color: var(--muted); font-size: 13px; text-align: left; }
     input { width: 100%; padding: 11px; color: white; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; }
     .submit { width: 100%; padding: 12px; margin-top: 12px; color: white; background: var(--success); }
     .close { width: 100%; padding: 10px; margin-top: 8px; color: white; background: #64748b; }
@@ -63,6 +63,10 @@
     
     .lb-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
     .lb-row:last-child { border-bottom: none; }
+
+    /* Custom Ad Popup Design */
+    .timer-badge { font-size: 32px; font-weight: bold; color: var(--accent); margin: 15px 0; }
+    .continue-btn { width: 100%; padding: 14px; background: #2563eb; color: white; font-size: 16px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -116,15 +120,29 @@
     </nav>
   </main>
 
+  <!-- Custom Ad Popup Modal -->
+  <div class="modal" id="adModal">
+    <div class="modal-content">
+      <h3 style="color:var(--gold)">🎁 Get Your Reward</h3>
+      <p class="notice" style="margin-top:8px">বিজ্ঞাপন দেখার জন্য অপেক্ষা করুন</p>
+      
+      <div class="timer-badge" id="adTimer">15</div>
+
+      <button class="continue-btn" id="continueAdBtn" disabled>অপেক্ষা করুন...</button>
+      <button class="close" id="cancelAdBtn">বাতিল করুন</button>
+    </div>
+  </div>
+
+  <!-- Withdraw Modal -->
   <div class="modal" id="withdrawModal">
     <div class="modal-content">
-      <h3>উইথড্র ফর্ম</h3>
-      <p class="notice" style="margin-top:8px">শুধু আপনার গেম Player UID দিন।</p>
+      <h3 style="text-align:left">উইথড্র ফর্ম</h3>
+      <p class="notice" style="margin-top:8px; text-align:left">শুধু আপনার গেম Player UID দিন।</p>
       <form id="withdrawForm">
         <label for="ffUid">Player UID</label>
         <input id="ffUid" type="text" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" required placeholder="Ex: 12345678" autocomplete="off">
         <button class="submit" type="submit">সাবমিট</button>
-        <button class="close" type="button" id="closeModal">বাতিল</button>
+        <button class="close" type="button" id="closeWithdrawModal">বাতিল</button>
       </form>
     </div>
   </div>
@@ -144,7 +162,7 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Telegram App
+    // Telegram App Setup
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
@@ -166,7 +184,7 @@
     const adData = stored?.date === today ? stored : { date: today, count: 0 };
     
     let points = 0;
-    let cooldown = false;
+    let timerInterval = null;
     const userRef = database.ref(`users/${userId}`);
 
     function updateUI() {
@@ -222,38 +240,49 @@
       });
     }
 
-    function startCooldown() {
-      cooldown = true;
-      const button = document.getElementById('watchAd');
-      button.disabled = true;
-      let seconds = 15;
+    // Step 1: Click "Watch Ad" -> Open Custom Popup with 15s Timer
+    const adModal = document.getElementById('adModal');
+    const continueAdBtn = document.getElementById('continueAdBtn');
+    const adTimer = document.getElementById('adTimer');
 
-      const timer = setInterval(() => {
-        button.textContent = `অপেক্ষা করুন (${seconds}s)`;
-        seconds--;
-        if (seconds < 0) {
-          clearInterval(timer);
-          cooldown = false;
-          button.disabled = false;
-          button.textContent = 'WATCH AD (+10 PTS)';
-        }
-      }, 1000);
-    }
-
-    // Rewarded Interstitial Ad Logic
     document.getElementById('watchAd').addEventListener('click', () => {
       if (adData.count >= dailyLimit) return alert('আজকের বিজ্ঞাপনের লিমিট শেষ।');
-      if (cooldown) return alert('অনুগ্রহ করে অপেক্ষা করুন।');
 
-      const btn = document.getElementById('watchAd');
-      btn.disabled = true;
+      adModal.classList.add('open');
+      let timeLeft = 15;
+      adTimer.textContent = timeLeft;
+      continueAdBtn.disabled = true;
+      continueAdBtn.textContent = 'অপেক্ষা করুন...';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        adTimer.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          adTimer.textContent = 'Ready!';
+          continueAdBtn.disabled = false;
+          continueAdBtn.textContent = 'CONTINUE (Get Reward)';
+        }
+      }, 1000);
+    });
+
+    // Cancel Ad Process
+    document.getElementById('cancelAdBtn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      adModal.classList.remove('open');
+    });
+
+    // Step 2: Click "Continue" -> Open Monetag Ad and Give Reward
+    continueAdBtn.addEventListener('click', () => {
+      adModal.classList.remove('open');
 
       if (typeof show_10678160 !== 'function') {
-        btn.disabled = false;
-        return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে, কিছু সময় পর আবার চেষ্টা করুন।');
+        return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে না, পেজটি রিফ্রেশ দিন।');
       }
 
-      // Exact Rewarded Interstitial Function
+      // Open Monetag Ad
       show_10678160().then(async () => {
         adData.count += 1;
         localStorage.setItem(`ad_data_${userId}`, JSON.stringify(adData));
@@ -264,19 +293,17 @@
           lastUpdated: new Date().toISOString()
         });
 
-        alert('🎉 You have seen an ad! ১০ পয়েন্ট যোগ হয়েছে।');
-        startCooldown();
+        alert('🎉 আপনার রিওয়ার্ড সফলভাবে যোগ হয়েছে (+১০ পয়েন্ট)!');
       }).catch((err) => {
-        btn.disabled = false;
         console.error("Ad error:", err);
-        alert('বিজ্ঞাপনটি পুরোটাই দেখা হয়নি বা কোনো সমস্যা হয়েছে।');
+        alert('বিজ্ঞাপনটি পুরো দেখা হয়নি বা কোনো সমস্যা হয়েছে।');
       });
     });
 
-    // Withdraw Modal Logic
+    // Withdraw Modal
     const withdrawModal = document.getElementById('withdrawModal');
     document.getElementById('withdrawButton').addEventListener('click', () => withdrawModal.classList.add('open'));
-    document.getElementById('closeModal').addEventListener('click', () => withdrawModal.classList.remove('open'));
+    document.getElementById('closeWithdrawModal').addEventListener('click', () => withdrawModal.classList.remove('open'));
 
     document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
       e.preventDefault();
