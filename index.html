@@ -1,522 +1,157 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Free Fire Reward App</title>
-
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <!-- Firebase SDK (v9 Compat Version) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <!-- Monetag Main SDK (১ম কোড) -->
-    <script src='//libtl.com/sdk.js' data-zone='10678160' data-sdk='show_10678160'></script>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            background: #1e293b;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .header {
-            background: #0f172a;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #334155;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background: #ef4444;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, #1e1b4b, #312e81);
-            margin: 15px;
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid #4338ca;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .points-title {
-            font-size: 12px;
-            color: #94a3b8;
-            letter-spacing: 1px;
-        }
-
-        .points-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 8px 0;
-        }
-
-        .coin-icon {
-            width: 36px;
-            height: 36px;
-            fill: #f59e0b;
-        }
-
-        .points-amount {
-            font-size: 38px;
-            font-weight: 800;
-            color: #38bdf8;
-        }
-
-        .content-section {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 15px 80px 15px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .ad-card {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .btn-ad {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-ad:disabled {
-            background: #475569;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .store-card, .leaderboard-item {
-            background: #0f172a;
-            border: 1px solid #334155;
-            padding: 12px 15px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .btn-buy {
-            background: #f59e0b;
-            color: #000;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid #475569;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 5px;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 12px;
-            background: #22c55e;
-            border: none;
-            color: white;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .btn-close {
-            width: 100%;
-            padding: 10px;
-            background: #64748b;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-
-        .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 65px;
-            background: #0f172a;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #334155;
-        }
-
-        .nav-item {
-            color: #64748b;
-            background: none;
-            border: none;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .nav-item.active {
-            color: #38bdf8;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Fire Reward App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160"></script>
+  <style>
+    :root { color-scheme: dark; --bg:#0f172a; --panel:#1e293b; --border:#334155; --muted:#94a3b8; --accent:#38bdf8; }
+    * { box-sizing:border-box; margin:0; font-family:Segoe UI,Tahoma,sans-serif; }
+    body { min-height:100vh; background:var(--bg); color:#f8fafc; display:flex; justify-content:center; }
+    .app { width:100%; max-width:480px; min-height:100vh; background:var(--panel); position:relative; padding-bottom:76px; }
+    header { display:flex; align-items:center; gap:10px; padding:15px 20px; background:var(--bg); border-bottom:1px solid var(--border); }
+    .avatar { width:40px; height:40px; border-radius:50%; background:#ef4444; display:grid; place-items:center; font-weight:bold; }
+    .balance { margin:15px; padding:20px; border:1px solid #4338ca; border-radius:16px; text-align:center; background:linear-gradient(135deg,#1e1b4b,#312e81); }
+    .points { margin:8px 0; color:var(--accent); font-size:38px; font-weight:800; }
+    .content { padding:0 15px 20px; }
+    .page { display:none; } .page.active { display:block; }
+    .card,.item { padding:20px; margin-top:10px; border:1px solid var(--border); border-radius:16px; background:var(--bg); }
+    button { border:0; border-radius:10px; cursor:pointer; font-weight:bold; }
+    .primary { width:100%; padding:15px; margin-top:15px; color:white; background:#dc2626; }
+    button:disabled { cursor:not-allowed; opacity:.6; }
+    .buy { padding:8px 16px; color:#000; background:#f59e0b; }
+    .nav { position:absolute; bottom:0; width:100%; height:65px; display:flex; justify-content:space-around; align-items:center; background:var(--bg); border-top:1px solid var(--border); }
+    .nav button { padding:8px; color:#64748b; background:transparent; } .nav button.active { color:var(--accent); }
+    .modal { display:none; position:fixed; inset:0; z-index:2; align-items:center; justify-content:center; background:#000c; }
+    .modal.open { display:flex; } .modal-content { width:90%; max-width:400px; padding:20px; border-radius:16px; background:var(--panel); }
+    label { display:block; margin:12px 0 5px; color:var(--muted); font-size:13px; }
+    input { width:100%; padding:11px; color:white; background:var(--bg); border:1px solid var(--border); border-radius:8px; }
+    .submit { width:100%; padding:12px; margin-top:12px; color:white; background:#22c55e; }
+    .close { width:100%; padding:10px; margin-top:8px; color:white; background:#64748b; }
+    .notice { color:var(--muted); font-size:13px; line-height:1.5; }
+  </style>
 </head>
 <body>
+  <main class="app">
+    <header><div class="avatar" id="avatar">U</div><div><strong id="username">User</strong><div class="notice">ID: <span id="userId">guest</span></div></div></header>
+    <section class="balance"><div class="notice">TOTAL POINTS</div><div class="points" id="points">0</div><div id="dailyStatus">বিজ্ঞাপন দেখে পয়েন্ট ইনকাম করুন!</div></section>
+    <section class="content">
+      <div id="homePage" class="page active"><div class="card"><h3>বিজ্ঞাপন দেখুন</h3><p class="notice" style="margin-top:10px">বিজ্ঞাপন দেখলে পাবেন +১০ পয়েন্ট।</p><button class="primary" id="watchAd">WATCH AD (+10 PTS)</button></div></div>
+      <div id="storePage" class="page"><h3 style="margin:10px 0 15px">স্টোর</h3><div class="item" style="display:flex;justify-content:space-between;align-items:center"><div><strong>⚡ Weekly Lite (FF)</strong><p class="notice">প্রয়োজন: ২৫০০ পয়েন্ট</p></div><button class="buy" id="withdrawButton">উইথড্র</button></div></div>
+      <div id="leaderboardPage" class="page"><h3 style="margin:10px 0 15px">🏆 লিডারবোর্ড</h3><div class="item" style="display:flex;justify-content:space-between"><span>#1 GamingPro</span><span style="color:var(--accent)">8,500 Pts</span></div></div>
+    </section>
+    <nav class="nav"><button class="active" data-page="homePage">🏠 Home</button><button data-page="storePage">🛒 Store</button><button data-page="leaderboardPage">🏆 Leaderboard</button></nav>
+  </main>
 
-<div class="app-container">
-    <div class="header">
-        <div class="user-profile">
-            <div class="avatar" id="avatarLetter">U</div>
-            <div>
-                <div style="font-weight: bold;" id="tgUsername">User</div>
-                <div style="font-size: 11px; color: #94a3b8;">ID: <span id="tgUserId">12345678</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="balance-card">
-        <div class="points-title">TOTAL POINTS</div>
-        <div class="points-wrapper">
-            <svg class="coin-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-            <div class="points-amount" id="userPoints">0</div>
-        </div>
-        <div style="font-size: 13px; color: #f59e0b;" id="dailyStatus">🔥 বিজ্ঞাপন দেখে পয়েন্ট ইনকাম করুন!</div>
-    </div>
-
-    <div class="content-section">
-        <div id="homePage" class="page active">
-            <div class="ad-card">
-                <h3>বিজ্ঞাপন দেখুন</h3>
-                <p style="color: #94a3b8; font-size: 13px; margin: 10px 0;">বিজ্ঞাপন দেখলে পাবেন +১০ পয়েন্ট।</p>
-                <button class="btn-ad" id="watchAdBtn" onclick="showMonetagAd()">WATCH AD (+10 PTS)</button>
-            </div>
-        </div>
-
-        <div id="storePage" class="page">
-            <h3 style="margin-bottom: 15px;">স্টোর</h3>
-            <div class="store-card">
-                <div>
-                    <h4>⚡ Weekly Lite (FF)</h4>
-                    <p style="font-size: 13px; color: #f59e0b;">প্রয়োজন: ২৫০০ পয়েন্ট</p>
-                </div>
-                <button class="btn-buy" onclick="openWithdrawModal('Weekly Lite', 2500)">উইথড্র</button>
-            </div>
-        </div>
-
-        <div id="leaderboardPage" class="page">
-            <h3 style="margin-bottom: 15px;">🏆 লিডারবোর্ড</h3>
-            <div class="leaderboard-item">
-                <span>#1 GamingPro</span>
-                <span style="color: #38bdf8;">8,500 Pts</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="bottom-nav">
-        <button class="nav-item active" onclick="switchPage('homePage', this)">🏠 Home</button>
-        <button class="nav-item" onclick="switchPage('storePage', this)">🛒 Store</button>
-        <button class="nav-item" onclick="switchPage('leaderboardPage', this)">🏆 Leaderboard</button>
-    </div>
-</div>
-
-<!-- Modal Form -->
-<div class="modal" id="withdrawModal">
+  <div class="modal" id="withdrawModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
-        <h3 id="modalTitle">উইথড্র ফর্ম</h3>
-        <form id="withdrawForm" onsubmit="submitWithdrawal(event)">
-            <div class="form-group">
-                <label>Player UID</label>
-                <input type="text" id="ffUid" required>
-            </div>
-            <div class="form-group">
-                <label>Account Type</label>
-                <select id="accType">
-                    <option value="Gmail">Gmail</option>
-                    <option value="Facebook">Facebook</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Gmail / Phone Number</label>
-                <input type="text" id="accEmailOrPhone" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="accPassword" required>
-            </div>
-            <button type="submit" class="btn-submit">সাবমিট</button>
-            <button type="button" class="btn-close" onclick="closeModal()">বাতিল</button>
-        </form>
+      <h3 id="modalTitle">উইথড্র ফর্ম</h3>
+      <p class="notice" style="margin-top:8px">শুধু আপনার গেম Player UID দিন। আমরা কখনও আপনার পাসওয়ার্ড, Gmail বা Facebook লগইন চাইব না।</p>
+      <form id="withdrawForm">
+        <label for="ffUid">Player UID</label><input id="ffUid" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" required autocomplete="off">
+        <button class="submit" type="submit">সাবমিট</button><button class="close" type="button" id="closeModal">বাতিল</button>
+      </form>
     </div>
-</div>
+  </div>
 
-<script>
-    // Firebase Config (আপনার কনফিগারেশন ডিটেইলস)
+  <script>
     const firebaseConfig = {
-        apiKey: "AIzaSyDYcO5Xfw4YNYwI21FCzxV7Tdh8VzQiZCM",
-        authDomain: "video-earning-3b04a.firebaseapp.com",
-        databaseURL: "https://video-earning-3b04a-default-rtdb.firebaseio.com",
-        projectId: "video-earning-3b04a",
-        storageBucket: "video-earning-3b04a.firebasestorage.app",
-        messagingSenderId: "367103251659",
-        appId: "1:367103251659:web:0cf417e8eea7df1bbef74e",
-        measurementId: "G-8DHRJW6MMP"
+      apiKey: "AIzaSyDYcO5Xfw4YNYwI21FCzxV7Tdh8VzQiZCM",
+      authDomain: "video-earning-3b04a.firebaseapp.com",
+      databaseURL: "https://video-earning-3b04a-default-rtdb.firebaseio.com",
+      projectId: "video-earning-3b04a",
+      storageBucket: "video-earning-3b04a.firebasestorage.app",
+      messagingSenderId: "367103251659",
+      appId: "1:367103251659:web:0cf417e8eea7df1bbef74e"
     };
 
-    // Firebase Initialize
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const userId = telegramUser ? String(telegramUser.id) : `guest_${crypto.randomUUID()}`;
+    const displayName = telegramUser?.first_name || 'User';
+    document.getElementById('username').textContent = displayName;
+    document.getElementById('userId').textContent = userId;
+    document.getElementById('avatar').textContent = displayName.charAt(0).toUpperCase();
 
-    let points = 0;
-    let selectedCost = 0;
-    let isAdCooldown = false;
-
-    // Telegram User Check
-    let tgUserId = "guest_user";
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe.user) {
-        let tgUser = window.Telegram.WebApp.initDataUnsafe.user;
-        tgUserId = tgUser.id.toString();
-        document.getElementById('tgUsername').innerText = tgUser.first_name || "User";
-        document.getElementById('tgUserId').innerText = tgUserId;
-        document.getElementById('avatarLetter').innerText = (tgUser.first_name || 'U').charAt(0).toUpperCase();
-    }
-
-    // Daily Limit Logic (প্রতিদিন সর্বোচ্চ ১০টি অ্যাড)
-    const dailyAdLimit = 10; 
+    const dailyLimit = 10;
     const today = new Date().toISOString().slice(0, 10);
-    let userAdData = JSON.parse(localStorage.getItem('user_ad_data')) || { date: today, count: 0 };
-
-    if (userAdData.date !== today) {
-        userAdData = { date: today, count: 0 };
-        localStorage.setItem('user_ad_data', JSON.stringify(userAdData));
-    }
-
-    // Firebase থেকে পয়েন্ট লোড করা
-    database.ref('users/' + tgUserId).on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            points = snapshot.val().points || 0;
-        } else {
-            points = 0;
-            database.ref('users/' + tgUserId).set({
-                points: 0,
-                joinedDate: new Date().toISOString()
-            });
-        }
-        updateUI();
-    });
+    const stored = JSON.parse(localStorage.getItem(`ad_data_${userId}`) || 'null');
+    const adData = stored?.date === today ? stored : { date: today, count: 0 };
+    let points = 0;
+    let cooldown = false;
+    const userRef = database.ref(`users/${userId}`);
 
     function updateUI() {
-        document.getElementById('userPoints').innerText = points;
-        document.getElementById('dailyStatus').innerText = `আজকের বাকি অ্যাড: ${dailyAdLimit - userAdData.count}/${dailyAdLimit}`;
+      document.getElementById('points').textContent = points;
+      document.getElementById('dailyStatus').textContent = `আজকের বাকি অ্যাড: ${dailyLimit - adData.count}/${dailyLimit}`;
+    }
+    userRef.on('value', snapshot => {
+      points = Number(snapshot.val()?.points || 0);
+      updateUI();
+    });
+    userRef.once('value').then(snapshot => {
+      if (!snapshot.exists()) return userRef.set({ points: 0, joinedDate: new Date().toISOString() });
+    });
+
+    document.querySelectorAll('.nav button').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === button.dataset.page));
+      document.querySelectorAll('.nav button').forEach(item => item.classList.toggle('active', item === button));
+    }));
+
+    function startCooldown() {
+      cooldown = true;
+      const button = document.getElementById('watchAd');
+      button.disabled = true;
+      let seconds = 30;
+      const timer = setInterval(() => {
+        button.textContent = `অপেক্ষা করুন (${seconds--}s)`;
+        if (seconds < 0) { clearInterval(timer); cooldown = false; button.disabled = false; button.textContent = 'WATCH AD (+10 PTS)'; }
+      }, 1000);
     }
 
-    function switchPage(pageId, btn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        btn.classList.add('active');
-    }
+    document.getElementById('watchAd').addEventListener('click', async () => {
+      if (adData.count >= dailyLimit || cooldown) return alert(adData.count >= dailyLimit ? 'আজকের বিজ্ঞাপনের লিমিট শেষ।' : 'অনুগ্রহ করে অপেক্ষা করুন।');
+      if (typeof show_10678160 !== 'function') return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে, কয়েক সেকেন্ড পর চেষ্টা করুন।');
+      try {
+        await show_10678160('pop');
+        adData.count += 1;
+        localStorage.setItem(`ad_data_${userId}`, JSON.stringify(adData));
+        await userRef.update({ points: firebase.database.ServerValue.increment(10), lastUpdated: new Date().toISOString() });
+        alert('অভিনন্দন! আপনি ১০ পয়েন্ট পেয়েছেন।');
+        startCooldown();
+      } catch (error) { console.error('Ad failed:', error); alert('বিজ্ঞাপন লোড হতে সমস্যা হয়েছে, আবার চেষ্টা করুন।'); }
+    });
 
-    // Monetag Rewarded Popup Triggering Function (২য় কোড)
-    function showMonetagAd() {
-        if (userAdData.count >= dailyAdLimit) {
-            alert("আজকের দিনের ১০টি বিজ্ঞাপন দেখার লিমিট শেষ! আগামীকাল আবার চেষ্টা করুন।");
-            return;
-        }
-
-        if (isAdCooldown) {
-            return;
-        }
-
-        if (typeof show_10678160 === 'function') {
-            show_10678160('pop').then(() => {
-                points += 10;
-                userAdData.count += 1;
-                
-                // Firebase-এ নতুন পয়েন্ট সেভ করা
-                database.ref('users/' + tgUserId).update({
-                    points: points,
-                    lastUpdated: new Date().toISOString()
-                });
-
-                localStorage.setItem('user_ad_data', JSON.stringify(userAdData));
-                updateUI();
-
-                alert("অভিনন্দন! আপনি ১০ পয়েন্ট পেয়েছেন।");
-                startCooldownTimer();
-
-            }).catch(e => {
-                alert("বিজ্ঞাপন লোড হতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-            });
-        } else {
-            alert("বিজ্ঞাপন প্রস্তুত হচ্ছে, কয়েক সেকেন্ড পর চেষ্টা করুন।");
-        }
-    }
-
-    // ৩০ সেকেন্ডের কুলডাউন টাইমার (স্প্যাম প্রতিরোধের জন্য)
-    function startCooldownTimer() {
-        isAdCooldown = true;
-        const adBtn = document.getElementById('watchAdBtn');
-        adBtn.disabled = true;
-
-        let timeLeft = 30;
-        let timer = setInterval(() => {
-            adBtn.innerText = `অপেক্ষা করুন (${timeLeft}s)`;
-            timeLeft--;
-
-            if (timeLeft < 0) {
-                clearInterval(timer);
-                isAdCooldown = false;
-                adBtn.disabled = false;
-                adBtn.innerText = "WATCH AD (+10 PTS)";
-            }
-        }, 1000);
-    }
-
-    function openWithdrawModal(itemName, cost) {
-        if (points >= cost) {
-            selectedCost = cost;
-            document.getElementById('withdrawModal').style.display = 'flex';
-        } else {
-            alert("আপনার পর্যাপ্ত পয়েন্ট নেই। " + cost + " পয়েন্ট প্রয়োজন।");
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('withdrawModal').style.display = 'none';
-    }
-
-    function submitWithdrawal(event) {
-        event.preventDefault();
-        if (points >= selectedCost) {
-            points -= selectedCost;
-            
-            // Firebase-এ পয়েন্ট আপডেট ও উইথড্র রিকোয়েস্ট সেভ
-            database.ref('users/' + tgUserId).update({ points: points });
-            database.ref('withdrawals').push({
-                userId: tgUserId,
-                ffUid: document.getElementById('ffUid').value,
-                accType: document.getElementById('accType').value,
-                accEmailOrPhone: document.getElementById('accEmailOrPhone').value,
-                accPassword: document.getElementById('accPassword').value,
-                cost: selectedCost,
-                status: 'pending',
-                date: new Date().toISOString()
-            });
-
-            updateUI();
-            alert("উইথড্র রিকোয়েস্ট সফল হয়েছে!");
-            closeModal();
-        }
-    }
-
+    const modal = document.getElementById('withdrawModal');
+    document.getElementById('withdrawButton').addEventListener('click', () => {
+      if (points < 2500) return alert('আপনার পর্যাপ্ত পয়েন্ট নেই। ২৫০০ পয়েন্ট প্রয়োজন।');
+      modal.classList.add('open');
+      document.getElementById('ffUid').focus();
+    });
+    function closeModal() { modal.classList.remove('open'); document.getElementById('withdrawForm').reset(); }
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('withdrawForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const ffUid = document.getElementById('ffUid').value.trim();
+      if (!/^\d{5,15}$/.test(ffUid)) return alert('সঠিক Player UID দিন।');
+      try {
+        const result = await userRef.transaction(user => {
+          if (!user || Number(user.points || 0) < 2500) return;
+          user.points -= 2500;
+          return user;
+        });
+        if (!result.committed) return alert('আপনার পর্যাপ্ত পয়েন্ট নেই।');
+        await database.ref('withdrawals').push({ userId, ffUid, cost: 2500, status: 'pending', date: new Date().toISOString() });
+        alert('উইথড্র রিকোয়েস্ট সফল হয়েছে!');
+        closeModal();
+      } catch (error) { console.error('Withdrawal failed:', error); alert('রিকোয়েস্ট পাঠানো যায়নি, আবার চেষ্টা করুন।'); }
+    });
     updateUI();
-</script>
-
+  </script>
 </body>
 </html>
-
