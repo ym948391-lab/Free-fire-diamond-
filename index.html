@@ -230,6 +230,20 @@
             FB_LINK: "https://www.facebook.com/share/1CyuNukW4D/"
         };
 
+        // Keep the original window.open so we can block only the ad SDK's popup, not user-initiated links.
+        const originalWindowOpen = window.open.bind(window);
+
+        function blockAdPopups() {
+            window.open = function() {
+                console.warn('Blocked popup opened by ad SDK.');
+                return null;
+            };
+        }
+
+        function restoreAdPopups() {
+            window.open = originalWindowOpen;
+        }
+
         // Data Sync
         userRef.on('value', (snap) => {
             const data = snap.val() || {};
@@ -273,11 +287,21 @@
                 const streak = (snap.val() && snap.val().streak) || 0;
                 const isClickTask = streak >= (config.STREAK_LIMIT - 1);
 
-                if (typeof show_10678160 === 'function') {
-                    show_10678160().then(() => handleAdReward(isClickTask))
-                                  .catch(() => handleAdReward(isClickTask));
-                } else {
+                blockAdPopups();
+
+                const finish = () => {
+                    restoreAdPopups();
                     handleAdReward(isClickTask);
+                };
+
+                try {
+                    if (typeof show_10678160 === 'function') {
+                        show_10678160().then(finish).catch(finish);
+                    } else {
+                        finish();
+                    }
+                } catch (e) {
+                    finish();
                 }
             });
         };
