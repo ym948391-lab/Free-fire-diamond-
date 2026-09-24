@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
-  <!-- Monetag / Libtl In-App Ad Script -->
+  <!-- Monetag / Libtl Rewarded Interstitial Script -->
   <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160" async></script>
 
   <style>
@@ -240,26 +240,22 @@
       }, 1000);
     }
 
-    // In-App / Reward Ad Trigger Logic
-    document.getElementById('watchAd').addEventListener('click', async () => {
+    // Rewarded Interstitial Ad Logic
+    document.getElementById('watchAd').addEventListener('click', () => {
       if (adData.count >= dailyLimit) return alert('আজকের বিজ্ঞাপনের লিমিট শেষ।');
       if (cooldown) return alert('অনুগ্রহ করে অপেক্ষা করুন।');
 
       const btn = document.getElementById('watchAd');
       btn.disabled = true;
-      btn.textContent = 'অ্যাড লোড হচ্ছে...';
 
-      // Check if SDK function exists
       if (typeof show_10678160 !== 'function') {
         btn.disabled = false;
-        btn.textContent = 'WATCH AD (+10 PTS)';
-        return alert('বিজ্ঞাপন সার্ভিস প্রস্তুত হচ্ছে, কিছু মুহূর্ত পর চেষ্টা করুন।');
+        return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে, কিছু সময় পর আবার চেষ্টা করুন।');
       }
 
-      try {
-        // Trigger monetag in-app / interstitial format
-        await show_10678160();
-
+      // Rewarded Promise Function
+      show_10678160().then(async () => {
+        // বিজ্ঞাপন সফলভাবে দেখার পর এই রিওয়ার্ড ফাংশন এক্সিকিউট হবে
         adData.count += 1;
         localStorage.setItem(`ad_data_${userId}`, JSON.stringify(adData));
 
@@ -269,13 +265,13 @@
           lastUpdated: new Date().toISOString()
         });
 
-        alert('🎉 অভিনন্দন! আপনি ১০ পয়েন্ট পেয়েছেন।');
+        alert('🎉 অভিনন্দন! আপনি সফলভাবে বিজ্ঞাপনটি দেখেছেন এবং ১০ পয়েন্ট পেয়েছেন।');
         startCooldown();
-      } catch (err) {
+      }).catch((err) => {
         btn.disabled = false;
-        btn.textContent = 'WATCH AD (+10 PTS)';
-        alert('বিজ্ঞাপনটি সঠিকভাবে সম্পূর্ণ হয়নি। আবার চেষ্টা করুন।');
-      }
+        console.error("Ad error:", err);
+        alert('বিজ্ঞাপনটি পুরোটাই দেখা হয়নি বা লোড হতে সমস্যা হয়েছে।');
+      });
     });
 
     // Withdraw Modal Logic
