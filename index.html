@@ -6,7 +6,347 @@
   <title>Free Fire Reward App</title>
   
   <!-- SDKs -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Free Fire Reward App</title>
+  
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  
+  <!-- Firebase Compatibility SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- Monetag Rewarded Interstitial SDK -->
+  <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160" async></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --border: #334155;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --gold: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, Tahoma, sans-serif; }
+    body { min-height: 100vh; background: var(--bg); color: #f8fafc; display: flex; justify-content: center; }
+    
+    .app { width: 100%; max-width: 480px; min-height: 100vh; background: var(--panel); position: relative; padding-bottom: 76px; }
+    
+    header { display: flex; align-items: center; gap: 10px; padding: 15px 20px; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ef4444; display: grid; place-items: center; font-weight: bold; font-size: 18px; }
+    
+    .balance { margin: 15px; padding: 20px; border: 1px solid #4338ca; border-radius: 16px; text-align: center; background: linear-gradient(135deg,#1e1b4b,#312e81); }
+    .points { margin: 8px 0; color: var(--accent); font-size: 38px; font-weight: 800; }
+    
+    .content { padding: 0 15px 20px; }
+    .page { display: none; } 
+    .page.active { display: block; }
+    
+    .card, .item { padding: 20px; margin-top: 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg); }
+    
+    button { border: 0; border-radius: 10px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+    button:active { opacity: 0.8; }
+    .primary { width: 100%; padding: 15px; margin-top: 15px; color: white; background: #dc2626; font-size: 15px; }
+    button:disabled { cursor: not-allowed; opacity: 0.5; }
+    .buy { padding: 8px 16px; color: #000; background: var(--gold); }
+    
+    .nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; height: 65px; display: flex; justify-content: space-around; align-items: center; background: var(--bg); border-top: 1px solid var(--border); z-index: 10; }
+    .nav button { padding: 8px 16px; color: #64748b; background: transparent; font-size: 14px; }
+    .nav button.active { color: var(--accent); font-weight: bold; }
+    
+    .modal { display: none; position: fixed; inset: 0; z-index: 20; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); }
+    .modal.open { display: flex; }
+    .modal-content { width: 90%; max-width: 400px; padding: 25px 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); text-align: center; }
+    
+    label { display: block; margin: 12px 0 5px; color: var(--muted); font-size: 13px; text-align: left; }
+    input { width: 100%; padding: 11px; color: white; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; }
+    .submit { width: 100%; padding: 12px; margin-top: 12px; color: white; background: var(--success); }
+    .close { width: 100%; padding: 10px; margin-top: 8px; color: white; background: #64748b; }
+    .notice { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    
+    .lb-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .lb-row:last-child { border-bottom: none; }
+
+    /* Custom Timer Popup Design */
+    .timer-badge { font-size: 36px; font-weight: bold; color: var(--accent); margin: 15px 0; }
+    .continue-btn { width: 100%; padding: 14px; background: #2563eb; color: white; font-size: 16px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="avatar" id="avatar">U</div>
+      <div>
+        <strong id="username">User</strong>
+        <div class="notice">ID: <span id="userId">guest</span></div>
+      </div>
+    </header>
+
+    <section class="balance">
+      <div class="notice">TOTAL POINTS</div>
+      <div class="points" id="points">0</div>
+      <div id="dailyStatus">বিজ্ঞাপন দেখে পয়েন্ট ইনকাম করুন!</div>
+    </section>
+
+    <section class="content">
+      <!-- Home Page -->
+      <div id="homePage" class="page active">
+        <div class="card">
+          <h3>বিজ্ঞাপন দেখুন</h3>
+          <p class="notice" style="margin-top:10px">বিজ্ঞাপন দেখলে পাবেন +১০ পয়েন্ট।</p>
+          <button class="primary" id="watchAd">WATCH AD (+10 PTS)</button>
+        </div>
+      </div>
+
+      <!-- Store Page -->
+      <div id="storePage" class="page">
+        <h3 style="margin:10px 0 15px">স্টোর</h3>
+        <div class="item" style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <strong>⚡ Weekly Lite (FF)</strong>
+            <p class="notice">প্রয়োজন: ২৫০০ পয়েন্ট</p>
+          </div>
+          <button class="buy" id="withdrawButton">উইথড্র</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard Page -->
+      <div id="leaderboardPage" class="page">
+        <h3 style="margin:10px 0 15px">🏆 লিডারবোর্ড</h3>
+        <div class="card" id="leaderboardList">
+          <div class="notice">লোড হচ্ছে...</div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="nav">
+      <button class="active" data-page="homePage">🏠 Home</button>
+      <button data-page="storePage">🛒 Store</button>
+      <button data-page="leaderboardPage">🏆 Leaderboard</button>
+    </nav>
+  </main>
+
+  <!-- Timer Modal Popup -->
+  <div class="modal" id="adModal">
+    <div class="modal-content">
+      <h3 style="color:var(--gold)">🎁 Reward Countdown</h3>
+      <p class="notice" style="margin-top:8px">বিজ্ঞাপন চালু করার আগে ১৫ সেকেন্ড অপেক্ষা করুন</p>
+      
+      <div class="timer-badge" id="adTimer">15</div>
+
+      <button class="continue-btn" id="continueAdBtn" disabled>অপেক্ষা করুন...</button>
+      <button class="close" id="cancelAdBtn">বাতিল করুন</button>
+    </div>
+  </div>
+
+  <!-- Withdraw Modal -->
+  <div class="modal" id="withdrawModal">
+    <div class="modal-content">
+      <h3 style="text-align:left">উইথড্র ফর্ম</h3>
+      <p class="notice" style="margin-top:8px; text-align:left">আপনার গেম Player UID লিখুন।</p>
+      <form id="withdrawForm">
+        <label for="ffUid">Player UID</label>
+        <input id="ffUid" type="text" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" required placeholder="Ex: 12345678" autocomplete="off">
+        <button class="submit" type="submit">সাবমিট</button>
+        <button class="close" type="button" id="closeWithdrawModal">বাতিল</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYcO5Xfw4YNYwI21FCzxV7Tdh8VzQiZCM",
+      authDomain: "video-earning-3b04a.firebaseapp.com",
+      databaseURL: "https://video-earning-3b04a-default-rtdb.firebaseio.com",
+      projectId: "video-earning-3b04a",
+      storageBucket: "video-earning-3b04a.firebasestorage.app",
+      messagingSenderId: "367103251659",
+      appId: "1:367103251659:web:0cf417e8eea7df1bbef74e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Telegram Integration
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    const telegramUser = tg?.initDataUnsafe?.user;
+    const userId = telegramUser ? String(telegramUser.id) : `guest_${Math.floor(Math.random() * 899999 + 100000)}`;
+    const displayName = telegramUser?.first_name || 'User';
+
+    document.getElementById('username').textContent = displayName;
+    document.getElementById('userId').textContent = userId;
+    document.getElementById('avatar').textContent = displayName.charAt(0).toUpperCase();
+
+    // Daily Limit Tracking
+    const dailyLimit = 10;
+    const today = new Date().toISOString().slice(0, 10);
+    const stored = JSON.parse(localStorage.getItem(`ad_data_${userId}`) || 'null');
+    const adData = stored?.date === today ? stored : { date: today, count: 0 };
+    
+    let points = 0;
+    let timerInterval = null;
+    const userRef = database.ref(`users/${userId}`);
+
+    function updateUI() {
+      document.getElementById('points').textContent = points;
+      document.getElementById('dailyStatus').textContent = `আজকের বাকি অ্যাড: ${dailyLimit - adData.count}/${dailyLimit}`;
+    }
+
+    userRef.on('value', snapshot => {
+      const val = snapshot.val();
+      points = Number(val?.points || 0);
+      updateUI();
+    });
+
+    userRef.once('value').then(snapshot => {
+      if (!snapshot.exists()) {
+        userRef.set({ name: displayName, points: 0, joinedDate: new Date().toISOString() });
+      }
+    });
+
+    // Navigation System
+    document.querySelectorAll('.nav button').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetPage = button.dataset.page;
+        document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === targetPage));
+        document.querySelectorAll('.nav button').forEach(item => item.classList.toggle('active', item === button));
+
+        if (targetPage === 'leaderboardPage') fetchLeaderboard();
+      });
+    });
+
+    function fetchLeaderboard() {
+      const container = document.getElementById('leaderboardList');
+      database.ref('users').orderByChild('points').limitToLast(10).once('value', snapshot => {
+        if (!snapshot.exists()) {
+          container.innerHTML = '<div class="notice">কোনো ডাটা পাওয়া যায়নি।</div>';
+          return;
+        }
+
+        let list = [];
+        snapshot.forEach(child => { list.push(child.val()); });
+        list.reverse();
+
+        let html = '';
+        list.forEach((user, index) => {
+          html += `
+            <div class="lb-row">
+              <span>#${index + 1} ${user.name || 'User'}</span>
+              <span style="color:var(--accent); font-weight:bold;">${user.points || 0} Pts</span>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      });
+    }
+
+    // Modal & Timer Logic
+    const adModal = document.getElementById('adModal');
+    const continueAdBtn = document.getElementById('continueAdBtn');
+    const adTimer = document.getElementById('adTimer');
+
+    document.getElementById('watchAd').addEventListener('click', () => {
+      if (adData.count >= dailyLimit) return alert('আজকের বিজ্ঞাপনের লিমিট শেষ।');
+
+      adModal.classList.add('open');
+      let timeLeft = 15;
+      adTimer.textContent = timeLeft;
+      continueAdBtn.disabled = true;
+      continueAdBtn.textContent = 'অপেক্ষা করুন...';
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        adTimer.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          adTimer.textContent = 'Ready!';
+          continueAdBtn.disabled = false;
+          continueAdBtn.textContent = 'CONTINUE (Get Reward)';
+        }
+      }, 1000);
+    });
+
+    document.getElementById('cancelAdBtn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      adModal.classList.remove('open');
+    });
+
+    // Trigger Monetag Ad Code
+    continueAdBtn.addEventListener('click', () => {
+      adModal.classList.remove('open');
+
+      if (typeof show_10678160 !== 'function') {
+        return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে না, পেজটি রিফ্রেশ দিন।');
+      }
+
+      show_10678160().then(async () => {
+        adData.count += 1;
+        localStorage.setItem(`ad_data_${userId}`, JSON.stringify(adData));
+
+        await userRef.update({
+          name: displayName,
+          points: firebase.database.ServerValue.increment(10),
+          lastUpdated: new Date().toISOString()
+        });
+
+        alert('You have seen an ad! (+১০ পয়েন্ট যোগ হয়েছে)');
+      }).catch((err) => {
+        console.error("Ad Error:", err);
+        alert('বিজ্ঞাপনটি পুরো দেখা হয়নি বা কোনো সমস্যা হয়েছে।');
+      });
+    });
+
+    // Withdrawal Logic
+    const withdrawModal = document.getElementById('withdrawModal');
+    document.getElementById('withdrawButton').addEventListener('click', () => withdrawModal.classList.add('open'));
+    document.getElementById('closeWithdrawModal').addEventListener('click', () => withdrawModal.classList.remove('open'));
+
+    document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ffUid = document.getElementById('ffUid').value.trim();
+
+      if (points < 2500) return alert('উইথড্র করতে কমপক্ষে ২৫০০ পয়েন্ট প্রয়োজন!');
+
+      try {
+        await database.ref('withdrawals').push({
+          userId: userId,
+          userName: displayName,
+          playerUid: ffUid,
+          points: 2500,
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+
+        await userRef.update({
+          points: firebase.database.ServerValue.increment(-2500)
+        });
+
+        alert('উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!');
+        withdrawModal.classList.remove('open');
+        document.getElementById('ffUid').value = '';
+      } catch (err) {
+        alert('উইথড্র জমা করতে সমস্যা হয়েছে।');
+      }
+    });
+  </script>
+</body>
+</html>
+>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
