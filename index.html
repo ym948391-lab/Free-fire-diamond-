@@ -10,7 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
-  <!-- Monetag / Libtl Rewarded Interstitial Script -->
+  <!-- Monetag Rewarded Interstitial Script -->
   <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160" async></script>
 
   <style>
@@ -130,7 +130,7 @@
   </div>
 
   <script>
-    // 1. Firebase Setup
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDYcO5Xfw4YNYwI21FCzxV7Tdh8VzQiZCM",
       authDomain: "video-earning-3b04a.firebaseapp.com",
@@ -159,7 +159,7 @@
     document.getElementById('userId').textContent = userId;
     document.getElementById('avatar').textContent = displayName.charAt(0).toUpperCase();
 
-    // Application state
+    // App state
     const dailyLimit = 10;
     const today = new Date().toISOString().slice(0, 10);
     const stored = JSON.parse(localStorage.getItem(`ad_data_${userId}`) || 'null');
@@ -250,12 +250,11 @@
 
       if (typeof show_10678160 !== 'function') {
         btn.disabled = false;
-        return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে, কিছু সময় পর আবার চেষ্টা করুন।');
+        return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে, কিছু সময় পর আবার চেষ্টা করুন।');
       }
 
-      // Rewarded Promise Function
+      // Exact Rewarded Interstitial Function
       show_10678160().then(async () => {
-        // বিজ্ঞাপন সফলভাবে দেখার পর এই রিওয়ার্ড ফাংশন এক্সিকিউট হবে
         adData.count += 1;
         localStorage.setItem(`ad_data_${userId}`, JSON.stringify(adData));
 
@@ -265,12 +264,12 @@
           lastUpdated: new Date().toISOString()
         });
 
-        alert('🎉 অভিনন্দন! আপনি সফলভাবে বিজ্ঞাপনটি দেখেছেন এবং ১০ পয়েন্ট পেয়েছেন।');
+        alert('🎉 You have seen an ad! ১০ পয়েন্ট যোগ হয়েছে।');
         startCooldown();
       }).catch((err) => {
         btn.disabled = false;
         console.error("Ad error:", err);
-        alert('বিজ্ঞাপনটি পুরোটাই দেখা হয়নি বা লোড হতে সমস্যা হয়েছে।');
+        alert('বিজ্ঞাপনটি পুরোটাই দেখা হয়নি বা কোনো সমস্যা হয়েছে।');
       });
     });
 
