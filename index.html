@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Video Earning App</title>
 
-    <!-- Monetag SDK (Unchanged) -->
+    <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='10678160' data-sdk='show_10678160'></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -14,16 +14,15 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-        
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 
-        body { 
-            background-color: #0D1117; 
-            color: #FFFFFF; 
-            padding: 20px 15px 90px 15px; 
+        body {
+            background-color: #0D1117;
+            color: #FFFFFF;
+            padding: 20px 15px 90px 15px;
         }
 
-        /* Header */
         .header {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
         }
@@ -33,7 +32,6 @@
             font-size: 11px; font-weight: 800;
         }
 
-        /* Points Card */
         .balance-card {
             background: linear-gradient(135deg, #1F2937, #111827);
             border: 1px solid rgba(255, 183, 3, 0.3);
@@ -41,20 +39,18 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); margin-bottom: 20px;
         }
         .balance-card p { font-size: 11px; letter-spacing: 1px; opacity: 0.9; color: #9CA3AF; }
-        
-        /* Coin Style Point Counter */
+
         .points-display {
             display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0;
         }
         .points-display img { width: 36px; height: 36px; object-fit: contain; }
         .amount { font-size: 36px; font-weight: 800; color: #FFFFFF; }
-        
+
         .progress-badge {
             font-size: 12px; background: rgba(255,255,255,0.05); padding: 5px 15px;
             border-radius: 15px; display: inline-block; color: #FBBC05;
         }
 
-        /* Info Grid */
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .info-box {
             background: #161B22; padding: 14px; border-radius: 16px; text-align: center;
@@ -63,7 +59,6 @@
         .info-box h4 { font-size: 16px; color: #34A853; margin-bottom: 2px; }
         .info-box span { font-size: 11px; color: #8E9BAE; }
 
-        /* Buttons */
         .btn {
             width: 100%; padding: 16px; border: none; border-radius: 16px;
             font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px;
@@ -73,23 +68,20 @@
         .btn-watch { background: #E63946; color: white; }
         .btn:active { transform: scale(0.98); }
 
-        /* Sections */
         .section { display: none; }
         .active-section { display: block; }
 
-        /* Withdraw Form Cards */
         .withdraw-card {
             background: #161B22; padding: 16px; border-radius: 16px; margin-bottom: 15px;
             border: 1px solid rgba(255,255,255,0.08);
         }
         .withdraw-card h4 { font-size: 15px; margin-bottom: 10px; color: #FFB703; display: flex; align-items: center; gap: 8px; }
-        
+
         select, input {
             width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
             outline: none; background: #0D1117; color: white; margin: 8px 0 15px 0; font-size: 14px;
         }
 
-        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: #161B22; display: grid; grid-template-columns: repeat(4, 1fr);
@@ -101,7 +93,6 @@
         }
         .nav-item i { font-size: 18px; color: white; display: block; margin-bottom: 3px; }
 
-        /* Timer Overlay */
         #timer-overlay {
             position: fixed; inset: 0; background: rgba(13, 17, 23, 0.95);
             display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -123,7 +114,6 @@
         <p style="color: #E63946; font-size: 11px;">Do not close until countdown ends!</p>
     </div>
 
-    <!-- HOME SECTION -->
     <div id="home-section" class="section active-section">
         <div class="header">
             <h3 id="greeting"><i class="fa-solid fa-coins"></i> Premium Rewards</h3>
@@ -133,7 +123,6 @@
         <div class="balance-card">
             <p>TOTAL BALANCE POINTS</p>
             <div class="points-display">
-                <!-- Coin / Earning Icon -->
                 <img src="https://cdn-icons-png.flaticon.com/512/272/272525.png" alt="Coin Points">
                 <div class="amount" id="total-points">0</div>
             </div>
@@ -158,20 +147,19 @@
         <button class="btn btn-watch" id="watch-ad-button">
             <i class="fa-solid fa-play-circle"></i> WATCH VIDEO (+10 PTS)
         </button>
-        
+
         <p style="text-align: center; font-size: 11px; color: #8E9BAE; margin-top: 10px;">
-            Watch 5 ads to unlock a high-reward special bonus click task!
+            Unlimited ads enabled. Watch as many as you want!
         </p>
     </div>
 
-    <!-- WITHDRAW SECTION -->
     <div id="withdraw-section" class="section">
         <h3 style="text-align: center; margin-bottom: 5px;">Withdraw Rewards</h3>
         <p style="text-align: center; color: #FBBC05; font-size: 12px; margin-bottom: 15px;">Convert your points into real earnings</p>
 
         <div class="withdraw-card">
             <h4><i class="fa-solid fa-wallet"></i> Cashout Details</h4>
-            
+
             <label style="font-size: 12px; color: #8E9BAE;">Select Payment Method:</label>
             <select id="withdraw-method">
                 <option value="bKash">bKash (5000 PTS = 50 BDT)</option>
@@ -189,16 +177,14 @@
         </div>
     </div>
 
-    <!-- NAVIGATION -->
     <div class="bottom-nav">
         <button class="nav-item" onclick="showSection('home-section')"><i class="fa-solid fa-house"></i>Home</button>
         <button class="nav-item" onclick="showSection('withdraw-section')"><i class="fa-solid fa-wallet"></i>Withdraw</button>
-        <button class="nav-item" onclick="window.open('https://t.me/videoearningofficial')"><i class="fa-solid fa-users"></i>Community</button>
-        <button class="nav-item" onclick="window.open('https://t.me/Botbyadmin')"><i class="fa-solid fa-headset"></i>Support</button>
+        <button class="nav-item" onclick="safeOpen('https://t.me/videoearningofficial')"><i class="fa-solid fa-users"></i>Community</button>
+        <button class="nav-item" onclick="safeOpen('https://t.me/Botbyadmin')"><i class="fa-solid fa-headset"></i>Support</button>
     </div>
 
     <script>
-        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyDYcO5Xfw4YNYwI21FCzxV7Tdh8VzQiZCM",
             authDomain: "video-earning-3b04a.firebaseapp.com",
@@ -206,36 +192,43 @@
             projectId: "video-earning-3b04a",
             appId: "1:367103251659:web:0cf417e8eea7df1bbef74e"
         };
-        
+
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Telegram Setup
         const tg = window.Telegram ? window.Telegram.WebApp : null;
-        if (tg) try { tg.expand(); } catch(e){}
+        if (tg) try { tg.expand(); } catch (e) {}
 
-        const user = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) 
-            ? tg.initDataUnsafe.user 
+        const user = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user)
+            ? tg.initDataUnsafe.user
             : { id: "1876755942", first_name: "User" };
 
         const userRef = database.ref('users/' + user.id);
         let currentPoints = 0;
 
-        // Configuration
         const config = {
             AD_REWARD: 10,
-            CLICK_REWARD: 50, 
+            CLICK_REWARD: 50,
             DAILY_REWARD: 100,
             STREAK_LIMIT: 5,
-            FB_LINK: "https://www.facebook.com/share/1CyuNukW4D/"
+            FB_LINK: "https://www.facebook.com/share/1CyuNukW4D/",
+            DAILY_AD_LIMIT: null,
+            ADS_UNLIMITED: true
         };
 
-        // Keep the original window.open so we can block only the ad SDK's popup, not user-initiated links.
         const originalWindowOpen = window.open.bind(window);
+
+        function safeOpen(url, target = '_blank') {
+            if (!url) return null;
+            try {
+                return originalWindowOpen(url, target, 'noopener,noreferrer');
+            } catch (e) {
+                return window.location.href = url;
+            }
+        }
 
         function blockAdPopups() {
             window.open = function() {
-                console.warn('Blocked popup opened by ad SDK.');
                 return null;
             };
         }
@@ -244,31 +237,56 @@
             window.open = originalWindowOpen;
         }
 
-        // Data Sync
-        userRef.on('value', (snap) => {
-            const data = snap.val() || {};
-            currentPoints = data.points || 0;
-            document.getElementById('total-points').innerText = currentPoints;
-            document.getElementById('streak-count').innerText = data.streak || 0;
-            document.getElementById('greeting').innerHTML = `<i class="fa-solid fa-coins"></i> Hi, ` + (user.first_name || "User");
-            document.getElementById('user-id-display').innerText = user.id;
-        });
-
         function notify(msg) {
             if (tg && tg.showAlert) tg.showAlert(msg);
             else alert(msg);
         }
 
-        // Daily Bonus Logic
+        function getTodayKey() {
+            return new Date().toDateString();
+        }
+
+        function setUnlimitedAdState(data) {
+            const today = getTodayKey();
+            const safeData = data || {};
+
+            if (!safeData.lastAdDate || safeData.lastAdDate !== today) {
+                safeData.lastAdDate = today;
+                safeData.adsToday = 0;
+            }
+
+            document.getElementById('ads-today-count').innerText = 'Unlimited';
+            safeData.adsToday = 0;
+            return safeData;
+        }
+
+        userRef.on('value', (snap) => {
+            const data = snap.val() || {};
+            const normalized = setUnlimitedAdState(data);
+
+            currentPoints = normalized.points || 0;
+            document.getElementById('total-points').innerText = currentPoints;
+            document.getElementById('streak-count').innerText = normalized.streak || 0;
+            document.getElementById('greeting').innerHTML = `<i class="fa-solid fa-coins"></i> Hi, ` + (user.first_name || "User");
+            document.getElementById('user-id-display').innerText = user.id;
+
+            if (normalized.lastAdDate !== getTodayKey()) {
+                userRef.update({
+                    lastAdDate: getTodayKey(),
+                    adsToday: 0
+                }).catch(() => {});
+            }
+        });
+
         document.getElementById('daily-bonus-button').onclick = function() {
             userRef.once('value', (snap) => {
                 const data = snap.val() || {};
-                const today = new Date().toDateString();
+                const today = getTodayKey();
 
                 if (data.lastDailyClaim === today) {
                     notify("You have already claimed your daily bonus points today!");
                 } else {
-                    window.open(config.FB_LINK, '_blank');
+                    safeOpen(config.FB_LINK);
                     userRef.transaction(d => {
                         if (!d) d = { points: 0, streak: 0 };
                         d.points = (d.points || 0) + config.DAILY_REWARD;
@@ -281,10 +299,10 @@
             });
         };
 
-        // Watch Ad Logic (Monetag Unchanged)
         document.getElementById('watch-ad-button').onclick = function() {
             userRef.once('value', (snap) => {
-                const streak = (snap.val() && snap.val().streak) || 0;
+                const data = snap.val() || {};
+                const streak = data.streak || 0;
                 const isClickTask = streak >= (config.STREAK_LIMIT - 1);
 
                 blockAdPopups();
@@ -338,13 +356,15 @@
                     d.points = (d.points || 0) + config.AD_REWARD;
                     d.streak = (d.streak || 0) + 1;
                 }
+
+                d.adsToday = (d.adsToday || 0) + 1;
+                d.lastAdDate = getTodayKey();
                 return d;
             }, (err, committed) => {
                 if (committed && isClickTask) notify(`Special Click Task +${config.CLICK_REWARD} Points added!`);
             });
         }
 
-        // Updated Withdrawal Logic
         function requestWithdraw() {
             const method = document.getElementById('withdraw-method').value;
             const number = document.getElementById('withdraw-number').value.trim();
@@ -359,7 +379,6 @@
                 return notify(`Insufficient points! You need at least ${minPointsRequired} points for ${method}.`);
             }
 
-            // Deduct Points & Submit Request
             userRef.transaction(d => {
                 if (d && (d.points || 0) >= minPointsRequired) {
                     d.points -= minPointsRequired;
@@ -368,12 +387,12 @@
             }, (err, committed) => {
                 if (committed) {
                     database.ref('withdrawRequests').push({
-                        userId: user.id, 
-                        name: user.first_name, 
-                        method: method, 
+                        userId: user.id,
+                        name: user.first_name,
+                        method: method,
                         accountNumber: number,
-                        pointsDeducted: minPointsRequired, 
-                        status: "Pending", 
+                        pointsDeducted: minPointsRequired,
+                        status: "Pending",
                         date: new Date().toLocaleString()
                     });
 
@@ -385,7 +404,6 @@
             });
         }
 
-        // Navigation
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
             document.getElementById(id).classList.add('active-section');
