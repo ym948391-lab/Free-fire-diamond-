@@ -2,63 +2,135 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Free Fire Reward App</title>
+  
+  <!-- SDKs -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160"></script>
+  
+  <!-- Monetag / Libtl In-App Ad Script -->
+  <script src="//libtl.com/sdk.js" data-zone="10678160" data-sdk="show_10678160" async></script>
+
   <style>
-    :root { color-scheme: dark; --bg:#0f172a; --panel:#1e293b; --border:#334155; --muted:#94a3b8; --accent:#38bdf8; }
-    * { box-sizing:border-box; margin:0; font-family:Segoe UI,Tahoma,sans-serif; }
-    body { min-height:100vh; background:var(--bg); color:#f8fafc; display:flex; justify-content:center; }
-    .app { width:100%; max-width:480px; min-height:100vh; background:var(--panel); position:relative; padding-bottom:76px; }
-    header { display:flex; align-items:center; gap:10px; padding:15px 20px; background:var(--bg); border-bottom:1px solid var(--border); }
-    .avatar { width:40px; height:40px; border-radius:50%; background:#ef4444; display:grid; place-items:center; font-weight:bold; }
-    .balance { margin:15px; padding:20px; border:1px solid #4338ca; border-radius:16px; text-align:center; background:linear-gradient(135deg,#1e1b4b,#312e81); }
-    .points { margin:8px 0; color:var(--accent); font-size:38px; font-weight:800; }
-    .content { padding:0 15px 20px; }
-    .page { display:none; } .page.active { display:block; }
-    .card,.item { padding:20px; margin-top:10px; border:1px solid var(--border); border-radius:16px; background:var(--bg); }
-    button { border:0; border-radius:10px; cursor:pointer; font-weight:bold; }
-    .primary { width:100%; padding:15px; margin-top:15px; color:white; background:#dc2626; }
-    button:disabled { cursor:not-allowed; opacity:.6; }
-    .buy { padding:8px 16px; color:#000; background:#f59e0b; }
-    .nav { position:absolute; bottom:0; width:100%; height:65px; display:flex; justify-content:space-around; align-items:center; background:var(--bg); border-top:1px solid var(--border); }
-    .nav button { padding:8px; color:#64748b; background:transparent; } .nav button.active { color:var(--accent); }
-    .modal { display:none; position:fixed; inset:0; z-index:2; align-items:center; justify-content:center; background:#000c; }
-    .modal.open { display:flex; } .modal-content { width:90%; max-width:400px; padding:20px; border-radius:16px; background:var(--panel); }
-    label { display:block; margin:12px 0 5px; color:var(--muted); font-size:13px; }
-    input { width:100%; padding:11px; color:white; background:var(--bg); border:1px solid var(--border); border-radius:8px; }
-    .submit { width:100%; padding:12px; margin-top:12px; color:white; background:#22c55e; }
-    .close { width:100%; padding:10px; margin-top:8px; color:white; background:#64748b; }
-    .notice { color:var(--muted); font-size:13px; line-height:1.5; }
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --border: #334155;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --gold: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Segoe UI, Tahoma, sans-serif; }
+    body { min-height: 100vh; background: var(--bg); color: #f8fafc; display: flex; justify-content: center; }
+    
+    .app { width: 100%; max-width: 480px; min-height: 100vh; background: var(--panel); position: relative; padding-bottom: 76px; }
+    
+    header { display: flex; align-items: center; gap: 10px; padding: 15px 20px; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #ef4444; display: grid; place-items: center; font-weight: bold; font-size: 18px; }
+    
+    .balance { margin: 15px; padding: 20px; border: 1px solid #4338ca; border-radius: 16px; text-align: center; background: linear-gradient(135deg,#1e1b4b,#312e81); }
+    .points { margin: 8px 0; color: var(--accent); font-size: 38px; font-weight: 800; }
+    
+    .content { padding: 0 15px 20px; }
+    .page { display: none; } 
+    .page.active { display: block; }
+    
+    .card, .item { padding: 20px; margin-top: 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg); }
+    
+    button { border: 0; border-radius: 10px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+    button:active { opacity: 0.8; }
+    .primary { width: 100%; padding: 15px; margin-top: 15px; color: white; background: #dc2626; font-size: 15px; }
+    button:disabled { cursor: not-allowed; opacity: 0.5; }
+    .buy { padding: 8px 16px; color: #000; background: var(--gold); }
+    
+    .nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; height: 65px; display: flex; justify-content: space-around; align-items: center; background: var(--bg); border-top: 1px solid var(--border); z-index: 10; }
+    .nav button { padding: 8px 16px; color: #64748b; background: transparent; font-size: 14px; }
+    .nav button.active { color: var(--accent); font-weight: bold; }
+    
+    .modal { display: none; position: fixed; inset: 0; z-index: 20; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); }
+    .modal.open { display: flex; }
+    .modal-content { width: 90%; max-width: 400px; padding: 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); }
+    
+    label { display: block; margin: 12px 0 5px; color: var(--muted); font-size: 13px; }
+    input { width: 100%; padding: 11px; color: white; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; }
+    .submit { width: 100%; padding: 12px; margin-top: 12px; color: white; background: var(--success); }
+    .close { width: 100%; padding: 10px; margin-top: 8px; color: white; background: #64748b; }
+    .notice { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    
+    .lb-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .lb-row:last-child { border-bottom: none; }
   </style>
 </head>
 <body>
   <main class="app">
-    <header><div class="avatar" id="avatar">U</div><div><strong id="username">User</strong><div class="notice">ID: <span id="userId">guest</span></div></div></header>
-    <section class="balance"><div class="notice">TOTAL POINTS</div><div class="points" id="points">0</div><div id="dailyStatus">বিজ্ঞাপন দেখে পয়েন্ট ইনকাম করুন!</div></section>
-    <section class="content">
-      <div id="homePage" class="page active"><div class="card"><h3>বিজ্ঞাপন দেখুন</h3><p class="notice" style="margin-top:10px">বিজ্ঞাপন দেখলে পাবেন +১০ পয়েন্ট।</p><button class="primary" id="watchAd">WATCH AD (+10 PTS)</button></div></div>
-      <div id="storePage" class="page"><h3 style="margin:10px 0 15px">স্টোর</h3><div class="item" style="display:flex;justify-content:space-between;align-items:center"><div><strong>⚡ Weekly Lite (FF)</strong><p class="notice">প্রয়োজন: ২৫০০ পয়েন্ট</p></div><button class="buy" id="withdrawButton">উইথড্র</button></div></div>
-      <div id="leaderboardPage" class="page"><h3 style="margin:10px 0 15px">🏆 লিডারবোর্ড</h3><div class="item" style="display:flex;justify-content:space-between"><span>#1 GamingPro</span><span style="color:var(--accent)">8,500 Pts</span></div></div>
+    <header>
+      <div class="avatar" id="avatar">U</div>
+      <div>
+        <strong id="username">User</strong>
+        <div class="notice">ID: <span id="userId">guest</span></div>
+      </div>
+    </header>
+
+    <section class="balance">
+      <div class="notice">TOTAL POINTS</div>
+      <div class="points" id="points">0</div>
+      <div id="dailyStatus">বিজ্ঞাপন দেখে পয়েন্ট ইনকাম করুন!</div>
     </section>
-    <nav class="nav"><button class="active" data-page="homePage">🏠 Home</button><button data-page="storePage">🛒 Store</button><button data-page="leaderboardPage">🏆 Leaderboard</button></nav>
+
+    <section class="content">
+      <div id="homePage" class="page active">
+        <div class="card">
+          <h3>বিজ্ঞাপন দেখুন</h3>
+          <p class="notice" style="margin-top:10px">বিজ্ঞাপন দেখলে পাবেন +১০ পয়েন্ট।</p>
+          <button class="primary" id="watchAd">WATCH AD (+10 PTS)</button>
+        </div>
+      </div>
+
+      <div id="storePage" class="page">
+        <h3 style="margin:10px 0 15px">স্টোর</h3>
+        <div class="item" style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <strong>⚡ Weekly Lite (FF)</strong>
+            <p class="notice">প্রয়োজন: ২৫০০ পয়েন্ট</p>
+          </div>
+          <button class="buy" id="withdrawButton">উইথড্র</button>
+        </div>
+      </div>
+
+      <div id="leaderboardPage" class="page">
+        <h3 style="margin:10px 0 15px">🏆 লিডারবোর্ড</h3>
+        <div class="card" id="leaderboardList">
+          <div class="notice">লোড হচ্ছে...</div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="nav">
+      <button class="active" data-page="homePage">🏠 Home</button>
+      <button data-page="storePage">🛒 Store</button>
+      <button data-page="leaderboardPage">🏆 Leaderboard</button>
+    </nav>
   </main>
 
-  <div class="modal" id="withdrawModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal" id="withdrawModal">
     <div class="modal-content">
-      <h3 id="modalTitle">উইথড্র ফর্ম</h3>
-      <p class="notice" style="margin-top:8px">শুধু আপনার গেম Player UID দিন। আমরা কখনও আপনার পাসওয়ার্ড, Gmail বা Facebook লগইন চাইব না।</p>
+      <h3>উইথড্র ফর্ম</h3>
+      <p class="notice" style="margin-top:8px">শুধু আপনার গেম Player UID দিন।</p>
       <form id="withdrawForm">
-        <label for="ffUid">Player UID</label><input id="ffUid" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" required autocomplete="off">
-        <button class="submit" type="submit">সাবমিট</button><button class="close" type="button" id="closeModal">বাতিল</button>
+        <label for="ffUid">Player UID</label>
+        <input id="ffUid" type="text" inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15" required placeholder="Ex: 12345678" autocomplete="off">
+        <button class="submit" type="submit">সাবমিট</button>
+        <button class="close" type="button" id="closeModal">বাতিল</button>
       </form>
     </div>
   </div>
 
   <script>
+    // 1. Firebase Setup
     const firebaseConfig = {
       apiKey: "AIzaSyDYcO5Xfw4YNYwI21FCzxV7Tdh8VzQiZCM",
       authDomain: "video-earning-3b04a.firebaseapp.com",
@@ -71,17 +143,28 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    const userId = telegramUser ? String(telegramUser.id) : `guest_${crypto.randomUUID()}`;
+
+    // Telegram App
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    const telegramUser = tg?.initDataUnsafe?.user;
+    const userId = telegramUser ? String(telegramUser.id) : `guest_${Math.floor(Math.random() * 899999 + 100000)}`;
     const displayName = telegramUser?.first_name || 'User';
+
     document.getElementById('username').textContent = displayName;
     document.getElementById('userId').textContent = userId;
     document.getElementById('avatar').textContent = displayName.charAt(0).toUpperCase();
 
+    // Application state
     const dailyLimit = 10;
     const today = new Date().toISOString().slice(0, 10);
     const stored = JSON.parse(localStorage.getItem(`ad_data_${userId}`) || 'null');
     const adData = stored?.date === today ? stored : { date: today, count: 0 };
+    
     let points = 0;
     let cooldown = false;
     const userRef = database.ref(`users/${userId}`);
@@ -90,68 +173,143 @@
       document.getElementById('points').textContent = points;
       document.getElementById('dailyStatus').textContent = `আজকের বাকি অ্যাড: ${dailyLimit - adData.count}/${dailyLimit}`;
     }
+
     userRef.on('value', snapshot => {
-      points = Number(snapshot.val()?.points || 0);
+      const val = snapshot.val();
+      points = Number(val?.points || 0);
       updateUI();
     });
+
     userRef.once('value').then(snapshot => {
-      if (!snapshot.exists()) return userRef.set({ points: 0, joinedDate: new Date().toISOString() });
+      if (!snapshot.exists()) {
+        userRef.set({ name: displayName, points: 0, joinedDate: new Date().toISOString() });
+      }
     });
 
-    document.querySelectorAll('.nav button').forEach(button => button.addEventListener('click', () => {
-      document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === button.dataset.page));
-      document.querySelectorAll('.nav button').forEach(item => item.classList.toggle('active', item === button));
-    }));
+    // Navigation
+    document.querySelectorAll('.nav button').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetPage = button.dataset.page;
+        document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === targetPage));
+        document.querySelectorAll('.nav button').forEach(item => item.classList.toggle('active', item === button));
+
+        if (targetPage === 'leaderboardPage') fetchLeaderboard();
+      });
+    });
+
+    function fetchLeaderboard() {
+      const container = document.getElementById('leaderboardList');
+      database.ref('users').orderByChild('points').limitToLast(10).once('value', snapshot => {
+        if (!snapshot.exists()) {
+          container.innerHTML = '<div class="notice">কোনো ডাটা পাওয়া যায়নি।</div>';
+          return;
+        }
+
+        let list = [];
+        snapshot.forEach(child => { list.push(child.val()); });
+        list.reverse();
+
+        let html = '';
+        list.forEach((user, index) => {
+          html += `
+            <div class="lb-row">
+              <span>#${index + 1} ${user.name || 'User'}</span>
+              <span style="color:var(--accent); font-weight:bold;">${user.points || 0} Pts</span>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      });
+    }
 
     function startCooldown() {
       cooldown = true;
       const button = document.getElementById('watchAd');
       button.disabled = true;
-      let seconds = 30;
+      let seconds = 15;
+
       const timer = setInterval(() => {
-        button.textContent = `অপেক্ষা করুন (${seconds--}s)`;
-        if (seconds < 0) { clearInterval(timer); cooldown = false; button.disabled = false; button.textContent = 'WATCH AD (+10 PTS)'; }
+        button.textContent = `অপেক্ষা করুন (${seconds}s)`;
+        seconds--;
+        if (seconds < 0) {
+          clearInterval(timer);
+          cooldown = false;
+          button.disabled = false;
+          button.textContent = 'WATCH AD (+10 PTS)';
+        }
       }, 1000);
     }
 
+    // In-App / Reward Ad Trigger Logic
     document.getElementById('watchAd').addEventListener('click', async () => {
-      if (adData.count >= dailyLimit || cooldown) return alert(adData.count >= dailyLimit ? 'আজকের বিজ্ঞাপনের লিমিট শেষ।' : 'অনুগ্রহ করে অপেক্ষা করুন।');
-      if (typeof show_10678160 !== 'function') return alert('বিজ্ঞাপন প্রস্তুত হচ্ছে, কয়েক সেকেন্ড পর চেষ্টা করুন।');
+      if (adData.count >= dailyLimit) return alert('আজকের বিজ্ঞাপনের লিমিট শেষ।');
+      if (cooldown) return alert('অনুগ্রহ করে অপেক্ষা করুন।');
+
+      const btn = document.getElementById('watchAd');
+      btn.disabled = true;
+      btn.textContent = 'অ্যাড লোড হচ্ছে...';
+
+      // Check if SDK function exists
+      if (typeof show_10678160 !== 'function') {
+        btn.disabled = false;
+        btn.textContent = 'WATCH AD (+10 PTS)';
+        return alert('বিজ্ঞাপন সার্ভিস প্রস্তুত হচ্ছে, কিছু মুহূর্ত পর চেষ্টা করুন।');
+      }
+
       try {
-        await show_10678160('pop');
+        // Trigger monetag in-app / interstitial format
+        await show_10678160();
+
         adData.count += 1;
         localStorage.setItem(`ad_data_${userId}`, JSON.stringify(adData));
-        await userRef.update({ points: firebase.database.ServerValue.increment(10), lastUpdated: new Date().toISOString() });
-        alert('অভিনন্দন! আপনি ১০ পয়েন্ট পেয়েছেন।');
+
+        await userRef.update({
+          name: displayName,
+          points: firebase.database.ServerValue.increment(10),
+          lastUpdated: new Date().toISOString()
+        });
+
+        alert('🎉 অভিনন্দন! আপনি ১০ পয়েন্ট পেয়েছেন।');
         startCooldown();
-      } catch (error) { console.error('Ad failed:', error); alert('বিজ্ঞাপন লোড হতে সমস্যা হয়েছে, আবার চেষ্টা করুন।'); }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'WATCH AD (+10 PTS)';
+        alert('বিজ্ঞাপনটি সঠিকভাবে সম্পূর্ণ হয়নি। আবার চেষ্টা করুন।');
+      }
     });
 
-    const modal = document.getElementById('withdrawModal');
-    document.getElementById('withdrawButton').addEventListener('click', () => {
-      if (points < 2500) return alert('আপনার পর্যাপ্ত পয়েন্ট নেই। ২৫০০ পয়েন্ট প্রয়োজন।');
-      modal.classList.add('open');
-      document.getElementById('ffUid').focus();
-    });
-    function closeModal() { modal.classList.remove('open'); document.getElementById('withdrawForm').reset(); }
-    document.getElementById('closeModal').addEventListener('click', closeModal);
-    document.getElementById('withdrawForm').addEventListener('submit', async event => {
-      event.preventDefault();
+    // Withdraw Modal Logic
+    const withdrawModal = document.getElementById('withdrawModal');
+    document.getElementById('withdrawButton').addEventListener('click', () => withdrawModal.classList.add('open'));
+    document.getElementById('closeModal').addEventListener('click', () => withdrawModal.classList.remove('open'));
+
+    document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
       const ffUid = document.getElementById('ffUid').value.trim();
-      if (!/^\d{5,15}$/.test(ffUid)) return alert('সঠিক Player UID দিন।');
+
+      if (points < 2500) return alert('উইথড্র করতে কমপক্ষে ২৫০০ পয়েন্ট প্রয়োজন!');
+
       try {
-        const result = await userRef.transaction(user => {
-          if (!user || Number(user.points || 0) < 2500) return;
-          user.points -= 2500;
-          return user;
+        await database.ref('withdrawals').push({
+          userId: userId,
+          userName: displayName,
+          playerUid: ffUid,
+          points: 2500,
+          status: 'pending',
+          createdAt: new Date().toISOString()
         });
-        if (!result.committed) return alert('আপনার পর্যাপ্ত পয়েন্ট নেই।');
-        await database.ref('withdrawals').push({ userId, ffUid, cost: 2500, status: 'pending', date: new Date().toISOString() });
-        alert('উইথড্র রিকোয়েস্ট সফল হয়েছে!');
-        closeModal();
-      } catch (error) { console.error('Withdrawal failed:', error); alert('রিকোয়েস্ট পাঠানো যায়নি, আবার চেষ্টা করুন।'); }
+
+        await userRef.update({
+          points: firebase.database.ServerValue.increment(-2500)
+        });
+
+        alert('উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!');
+        withdrawModal.classList.remove('open');
+        document.getElementById('ffUid').value = '';
+      } catch (err) {
+        alert('উইথড্র জমা করতে কোনো সমস্যা হয়েছে।');
+      }
     });
-    updateUI();
   </script>
 </body>
 </html>
